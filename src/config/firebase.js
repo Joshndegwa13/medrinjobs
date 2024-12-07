@@ -3,12 +3,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: "AIzaSyD5aIhXUqxzFUOIk58GdMnoKtkuaXmmoEU",
+  authDomain: "medrin-jobs-88edf.firebaseapp.com",
+  projectId: "medrin-jobs-88edf",
+  storageBucket: "medrin-jobs-88edf.firebasestorage.app",
+  messagingSenderId: "312255869402",
+  appId: "1:312255869402:web:23f5abfdd22437030e90e3"
 };
 
 const app = initializeApp(firebaseConfig);
