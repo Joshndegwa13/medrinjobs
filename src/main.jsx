@@ -10,6 +10,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { registerSW } from './pwa';
 import './index.css';
 
+// Configure React Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -24,9 +25,13 @@ const queryClient = new QueryClient({
 // Register service worker
 registerSW();
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// Create root element
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+// Render app with providers
+root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <AuthProvider>

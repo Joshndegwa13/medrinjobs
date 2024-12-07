@@ -11,23 +11,12 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Initialize Firebase only if config is valid
-const validateConfig = () => {
-  return Object.values(firebaseConfig).every(value => value !== undefined && value !== '');
-};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-let app, auth, db;
-
-if (validateConfig()) {
-  try {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-  } catch (error) {
-    console.error('Firebase initialization error:', error);
-  }
-} else {
-  console.error('Invalid Firebase configuration. Check your environment variables.');
+if (!auth || !db) {
+  console.error('Firebase services initialization failed');
 }
 
 export { auth, db };
