@@ -8,7 +8,7 @@ import { PhotoIcon, DocumentIcon } from '@heroicons/react/24/outline';
 
 const CompleteProfile = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, completeEmployerProfile, completeJobSeekerProfile } = useAuth(); // updated
   const { createProfile, loading } = useProfile();
   const [formData, setFormData] = useState(
     user?.userType === 'employer'
@@ -53,13 +53,10 @@ const CompleteProfile = () => {
   const handleFileChange = async (e) => {
     const { name, files } = e.target;
     if (files[0]) {
-      // Validate file size (max 1MB)
       if (files[0].size > 1024 * 1024) {
         toast.error('File size must be less than 1MB');
         return;
       }
-
-      // Convert to base64
       const base64 = await convertToBase64(files[0]);
       setFormData(prev => ({
         ...prev,
@@ -84,22 +81,24 @@ const CompleteProfile = () => {
     try {
       const profileData = { ...formData };
 
-      // Remove File objects and use base64 URLs
       if (user.userType === 'employer') {
         delete profileData.companyLogo;
-        profileData.logo = profileData.companyLogoUrl;
+        profileData.logoData = { url: profileData.companyLogoUrl };
         delete profileData.companyLogoUrl;
+
+        await completeEmployerProfile(profileData); // updates user in context
+        navigate('/employer');
       } else {
         delete profileData.profileImage;
         delete profileData.cv;
-        profileData.avatar = profileData.profileImageUrl;
-        profileData.cvFile = profileData.cvUrl;
+        profileData.profileImageData = { url: profileData.profileImageUrl };
+        profileData.cvData = { url: profileData.cvUrl };
         delete profileData.profileImageUrl;
         delete profileData.cvUrl;
-      }
 
-      await createProfile(profileData);
-      navigate(user.userType === 'employer' ? '/employer' : '/find-jobs');
+        await completeJobSeekerProfile(profileData); // updates user in context
+        navigate('/find-jobs');
+      }
     } catch (error) {
       console.error('Profile completion error:', error);
       toast.error('Failed to complete profile');
@@ -120,8 +119,8 @@ const CompleteProfile = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {user?.userType === 'employer' ? (
-              // Employer Profile Form
               <>
+                {/* Employer Profile Form */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Company Logo
@@ -168,7 +167,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Industry
@@ -182,7 +180,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Company Size
@@ -202,7 +199,6 @@ const CompleteProfile = () => {
                       <option value="501+">501+ employees</option>
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Founded Year
@@ -218,7 +214,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Website
@@ -232,7 +227,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Location
@@ -291,8 +285,8 @@ const CompleteProfile = () => {
                 </div>
               </>
             ) : (
-              // Job Seeker Profile Form
               <>
+                {/* Job Seeker Profile Form */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Profile Picture
@@ -339,7 +333,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Last Name
@@ -353,7 +346,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Professional Title
@@ -368,7 +360,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Location
@@ -382,7 +373,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Phone Number
@@ -396,7 +386,6 @@ const CompleteProfile = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Date of Birth
