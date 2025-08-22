@@ -14,31 +14,22 @@ const PrivateRoute = ({ children, userType, redirectTo = '/login' }) => {
     );
   }
 
-  // Not logged in
   if (!user) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
-  // Restrict access based on user type if specified
+  // Restrict access based on user type
   if (userType && user.userType !== userType) {
-    // If logged in as job seeker trying to access employer routes
-    if (user.userType === 'job_seeker' && userType === 'employer') {
-      return <Navigate to="/login" state={{ employerRequired: true }} replace />;
-    }
-    // If logged in as employer trying to access job seeker routes
-    if (user.userType === 'employer' && userType === 'job_seeker') {
-      return <Navigate to="/login" state={{ jobSeekerRequired: true }} replace />;
-    }
     return <Navigate to={user.userType === 'employer' ? '/employer' : '/find-jobs'} replace />;
   }
 
-  // Redirect to profile completion if needed
-  if (!user.profileComplete && 
-      !location.pathname.includes('complete-profile')) {
-    return <Navigate 
-      to={`/${user.userType === 'employer' ? 'employer' : 'jobseeker'}/complete-profile`} 
-      replace 
-    />;
+  // Redirect to profile completion only if needed
+  const profilePath = user.userType === 'employer'
+    ? '/employer/complete-profile'
+    : '/jobseeker/complete-profile';
+
+  if (!user.profileComplete && location.pathname !== profilePath) {
+    return <Navigate to={profilePath} replace />;
   }
 
   return children;
