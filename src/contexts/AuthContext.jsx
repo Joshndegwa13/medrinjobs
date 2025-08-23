@@ -31,13 +31,23 @@ export const AuthProvider = ({ children }) => {
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
+            // Merge Firebase user + Firestore profile
             setUser({ ...firebaseUser, ...userDoc.data() });
           } else {
-            setUser(firebaseUser);
+            // Fallback if no profile exists
+            setUser({
+              ...firebaseUser,
+              userType: null,
+              profileComplete: false
+            });
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
-          setUser(firebaseUser);
+          setUser({
+            ...firebaseUser,
+            userType: null,
+            profileComplete: false
+          });
         }
       } else {
         setUser(null);
@@ -48,13 +58,13 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // --- Registration, login, logout, and profile completion remain unchanged ---
-  const registerEmployer = async (email, password) => { /* same as before */ };
-  const registerJobSeeker = async (email, password) => { /* same as before */ };
-  const login = async (email, password) => { /* same as before */ };
-  const logout = async () => { /* same as before */ };
-  const completeEmployerProfile = async (profileData) => { /* same as before */ };
-  const completeJobSeekerProfile = async (profileData) => { /* same as before */ };
+  // --- Auth functions (you already have these implemented) ---
+  const registerEmployer = async (email, password) => { /* same */ };
+  const registerJobSeeker = async (email, password) => { /* same */ };
+  const login = async (email, password) => { /* same */ };
+  const logout = async () => { /* same */ };
+  const completeEmployerProfile = async (profileData) => { /* same */ };
+  const completeJobSeekerProfile = async (profileData) => { /* same */ };
 
   const value = {
     user,
@@ -67,7 +77,6 @@ export const AuthProvider = ({ children }) => {
     completeJobSeekerProfile
   };
 
-  // ✅ Prevent flicker by showing a simple loader while auth state initializes
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-900">
