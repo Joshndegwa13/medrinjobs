@@ -23,91 +23,126 @@ import PrivateRoute from './components/PrivateRoute';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth(); // ✅ include loading state
   const location = useLocation();
 
   const renderNavbar = () => {
-    // Show default navbar for auth pages and landing page
-    if (['/login', '/signup', '/signup/employer', '/signup/job-seeker'].includes(location.pathname) || 
-        location.pathname === '/') {
+    if (
+      ['/login', '/signup', '/signup/employer', '/signup/job-seeker'].includes(location.pathname) || 
+      location.pathname === '/'
+    ) {
       return <Navbar />;
     }
 
-    // Show specific navbars based on user type and authentication
     if (user) {
-      if (user.userType === 'employer') {
-        return <EmployerNavbar />;
-      }
-      if (user.userType === 'job_seeker') {
-        return <JobSeekerNavbar />;
-      }
+      if (user.userType === 'employer') return <EmployerNavbar />;
+      if (user.userType === 'job_seeker') return <JobSeekerNavbar />;
     }
 
-    // Default to main navbar
     return <Navbar />;
   };
+
+  if (loading) {
+    // ✅ Prevents white screen while Firebase/Auth is still checking session
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-dark-900">
+        <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-dark-900">
       <ScrollProgress />
       {renderNavbar()}
+
       <Routes>
-        <Route path="/" element={
-          <>
-            <Hero />
-            <Categories />
-            <Testimonials />
-          </>
-        } />
-        
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero />
+              <Categories />
+              <Testimonials />
+            </>
+          }
+        />
+
         {/* Protected Job Seeker Routes */}
-        <Route path="/find-jobs" element={
-          <PrivateRoute>
-            <FindJobs />
-          </PrivateRoute>
-        } />
-        <Route path="/profile" element={
-          <PrivateRoute userType="job_seeker">
-            <Profile />
-          </PrivateRoute>
-        } />
-        <Route path="/jobseeker/complete-profile" element={
-          <PrivateRoute userType="job_seeker">
-            <CompleteProfile />
-          </PrivateRoute>
-        } />
+        <Route
+          path="/find-jobs"
+          element={
+            <PrivateRoute>
+              <FindJobs />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute userType="job_seeker">
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/jobseeker/complete-profile"
+          element={
+            <PrivateRoute userType="job_seeker">
+              <CompleteProfile />
+            </PrivateRoute>
+          }
+        />
 
         {/* Protected Employer Routes */}
-        <Route path="/employer" element={
-          <PrivateRoute userType="employer">
-            <EmployerDashboard />
-          </PrivateRoute>
-        } />
-        <Route path="/employer/post-job" element={
-          <PrivateRoute userType="employer">
-            <PostJob />
-          </PrivateRoute>
-        } />
-        <Route path="/employer/candidates" element={
-          <PrivateRoute userType="employer">
-            <CandidateManagement />
-          </PrivateRoute>
-        } />
-        <Route path="/employer/pricing" element={
-          <PrivateRoute userType="employer">
-            <PricingPlans />
-          </PrivateRoute>
-        } />
-        <Route path="/employer/profile" element={
-          <PrivateRoute userType="employer">
-            <CompanyProfile />
-          </PrivateRoute>
-        } />
-        <Route path="/employer/complete-profile" element={
-          <PrivateRoute userType="employer">
-            <CompleteProfile />
-          </PrivateRoute>
-        } />
+        <Route
+          path="/employer"
+          element={
+            <PrivateRoute userType="employer">
+              <EmployerDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/employer/post-job"
+          element={
+            <PrivateRoute userType="employer">
+              <PostJob />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/employer/candidates"
+          element={
+            <PrivateRoute userType="employer">
+              <CandidateManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/employer/pricing"
+          element={
+            <PrivateRoute userType="employer">
+              <PricingPlans />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/employer/profile"
+          element={
+            <PrivateRoute userType="employer">
+              <CompanyProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/employer/complete-profile"
+          element={
+            <PrivateRoute userType="employer">
+              <CompleteProfile />
+            </PrivateRoute>
+          }
+        />
 
         {/* Auth Routes */}
         <Route path="/signup" element={<SignUp />} />
@@ -115,6 +150,7 @@ function App() {
         <Route path="/signup/employer" element={<InitialSignUp userType="employer" />} />
         <Route path="/signup/job-seeker" element={<InitialSignUp userType="job_seeker" />} />
       </Routes>
+
       <Footer />
     </div>
   );
