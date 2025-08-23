@@ -6,6 +6,7 @@ const PrivateRoute = ({ children, userType, redirectTo = '/login' }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  // Show spinner while checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -14,21 +15,31 @@ const PrivateRoute = ({ children, userType, redirectTo = '/login' }) => {
     );
   }
 
+  // If no user logged in → go to login
   if (!user) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
-  // Restrict access based on user type
+  // If user exists but we don’t yet know their type → wait
+  if (userType && !user.userType) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  // Restrict based on type
   if (userType && user.userType !== userType) {
     return <Navigate to={user.userType === 'employer' ? '/employer' : '/find-jobs'} replace />;
   }
 
-  // Redirect to profile completion only if needed
+  // Redirect to profile completion if incomplete
   const profilePath = user.userType === 'employer'
     ? '/employer/complete-profile'
     : '/jobseeker/complete-profile';
 
-  if (!user.profileComplete && location.pathname !== profilePath) {
+  if (user.userType && !user.profileComplete && location.pathname !== profilePath) {
     return <Navigate to={profilePath} replace />;
   }
 
